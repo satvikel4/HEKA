@@ -12,9 +12,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
+# Load the diabetes dataset
 diabetes = pd.read_csv('/Users/satvikeltepu/Desktop/diabetes.csv')
 
 def train_and_evaluate_models(X_train, Y_train):
+    # Initialize and train machine learning models
     log = LogisticRegression(random_state=0)
     log.fit(X_train, Y_train)
 
@@ -36,17 +38,23 @@ def train_and_evaluate_models(X_train, Y_train):
     forest = RandomForestClassifier(n_estimators=10, criterion='entropy', random_state=0)
     forest.fit(X_train, Y_train)
 
-    print('[0]Logistic Regression Training Accuracy:', log.score(X_train, Y_train))
-    print('[1]K Nearest Neighbor Training Accuracy:', knn.score(X_train, Y_train))
-    print('[2]Support Vector Machine (Linear Classifier) Training Accuracy:', svc_lin.score(X_train, Y_train))
-    print('[3]Support Vector Machine (RBF Classifier) Training Accuracy:', svc_rbf.score(X_train, Y_train))
-    print('[4]Gaussian Naive Bayes Training Accuracy:', gauss.score(X_train, Y_train))
-    print('[5]Decision Tree Classifier Training Accuracy:', tree.score(X_train, Y_train))
-    print('[6]Random Forest Classifier Training Accuracy:', forest.score(X_train, Y_train))
+    # Evaluate and print model accuracies
+    models = {
+        'Logistic Regression': log,
+        'K Nearest Neighbor': knn,
+        'SVM (Linear Classifier)': svc_lin,
+        'SVM (RBF Classifier)': svc_rbf,
+        'Gaussian Naive Bayes': gauss,
+        'Decision Tree Classifier': tree,
+        'Random Forest Classifier': forest
+    }
 
-    return log, knn, svc_lin, svc_rbf, gauss, tree, forest
+    for model_name, model in models.items():
+        accuracy = model.score(X_test, Y_test)
+        print(f'{model_name} Test Accuracy: {accuracy:.2f}')
 
 if __name__ == '__main__':
+    # Split the dataset into training and testing sets
     X_train, X_test, Y_train, Y_test = train_test_split(
         diabetes.loc[:, diabetes.columns != 'Outcome'],
         diabetes['Outcome'],
@@ -54,4 +62,5 @@ if __name__ == '__main__':
         random_state=66
     )
 
-    models = train_and_evaluate_models(X_train, Y_train)
+    # Train and evaluate machine learning models
+    train_and_evaluate_models(X_train, Y_train)
