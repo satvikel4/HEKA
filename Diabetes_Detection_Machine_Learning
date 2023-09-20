@@ -1,73 +1,38 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
-
-
-get_ipython().system('pip3 install python_jwt')
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from firebase import firebase
-
-get_ipython().run_line_magic('matplotlib', 'inline')
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
 
 diabetes = pd.read_csv('/Users/satvikeltepu/Desktop/diabetes.csv')
 
+X_train, X_test, Y_train, Y_test = train_test_split(
+    diabetes.loc[:, diabetes.columns != 'Outcome'],
+    diabetes['Outcome'],
+    stratify=diabetes['Outcome'],
+    random_state=66
+)
 
-# In[7]:
-
-
-from sklearn.model_selection import train_test_split
-X_train, X_test, Y_train, Y_test = train_test_split(diabetes.loc[:, diabetes.columns != 'Outcome'], diabetes['Outcome'], stratify=diabetes['Outcome'], random_state=66)
-
-
-# In[ ]:
-
-
-from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-
-# In[ ]:
-
-
-#Using DecisionTreeClassifier 
-from sklearn.tree import DecisionTreeClassifier
-tree = DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
+tree = DecisionTreeClassifier(criterion='entropy', random_state=0)
 tree.fit(X_train, Y_train)
 
-
-# In[ ]:
-
-
 data = int(input("Enter data: "))
-
-
-# In[ ]:
-
-
 prediction = tree.predict(X_test[[data]])
 print(prediction)
 
-
-# In[ ]:
-
-
 firebase = firebase.FirebaseApplication("https://diabetes-857d7.firebaseio.com/", None)
 data = {
-    'Diabetes': pred,
+    'Diabetes': prediction.tolist(),
 }
 
 result = firebase.put("testdata", "LWEis88nRrBK6fJyFHUt", data)
 print(result)
-
-
-# In[ ]:
-
-
-
-
